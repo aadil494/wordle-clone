@@ -1,15 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
   createBoxes();
+  let words = []
   let guessedWords = [[]];
   let availableSpace = 1;
   let word = "dairy";
   const keys = document.querySelectorAll(".keyboard-row button");
-  function httpGet(theUrl) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", theUrl, false); // false for synchronous request
-    xmlHttp.send(null);
-    return xmlHttp.responseText;
-  }
+
 
   function handleSubmitWord() {
     let currWordArr = getCurrentWordArray();

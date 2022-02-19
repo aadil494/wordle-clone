@@ -1,25 +1,31 @@
 document.addEventListener("DOMContentLoaded", function () {
   createBoxes();
-  let words = []
+  let words = [];
   let guessedWords = [[]];
   let availableSpace = 1;
-  let word = "dairy";
+
+  words = httpGet("./five_letter_words.txt")
+    .split("\n")
+    .map((word) => word.toLowerCase().replace("\r", "")); // get words from file
+  console.log(words);
+  let word = words[Math.floor(Math.random() * words.length)];
+  console.log(word);
   const keys = document.querySelectorAll(".keyboard-row button");
+  function httpGet(theUrl) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", theUrl, false); // false for synchronous request
+    xmlHttp.send(null);
+    return xmlHttp.responseText;
+  }
 
-
+  console.log(words);
   function handleSubmitWord() {
     let currWordArr = getCurrentWordArray();
     let end = guessedWords.length * 5;
     if (currWordArr.length == 5) {
       let currWord = currWordArr.join("");
-      if (
-        httpGet(
-          "https://api.dictionaryapi.dev/api/v2/entries/en/" + currWord
-        ).includes(
-          "Sorry pal, we couldn't find definitions for the word you were looking for"
-        )
-      ) {
-        alert("Word not found");
+      if (!words.includes(currWord.toLowerCase())) {
+        console.log("Word not in the dictionary");
         return;
       }
 

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let words = [];
   let guessedWords = [[]];
   let availableSpace = 1;
-
+  let wordSubmitted = false;
   words = httpGet("./five_letter_words.txt")
     .split("\n")
     .map((word) => word.toLowerCase().replace("\r", "")); // get words from file
@@ -19,9 +19,69 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   console.log(words);
+  function getPressedKey(e) {
+    let allowedKeys = [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+      "backspace",
+      "enter",
+    ];
+    let keynum;
+    console.log("key pressed");
+    if (window.event) {
+      // IE
+      keynum = e.keyCode;
+    } else if (e.which) {
+      // Netscape/Firefox/Opera
+      keynum = e.which;
+    }
+    if(keynum === 8){
+      return "backspace";
+    }
+    if (keynum === 13) {
+      return "enter";
+    }
+    console.log(keynum);
+    let key = String.fromCharCode(keynum);
+    if (!allowedKeys.includes(key.toLowerCase())) {
+      return;
+    }
+
+    return key;
+  }
+
   function handleSubmitWord() {
+    if(wordSubmitted){
+      return;
+    }
+    wordSubmitted = true;
     let currWordArr = getCurrentWordArray();
     let end = guessedWords.length * 5;
+    console.log(currWordArr)
     if (currWordArr.length == 5) {
       let currWord = currWordArr.join("");
       if (!words.includes(currWord.toLowerCase())) {
@@ -29,13 +89,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+
       if (currWord === word) {
         for (let i = end; i > end - 5; i--) {
+          console.log(i)
           document.getElementById(`${i}`).style.backgroundColor = "green";
         }
       } else if (currWord !== word) {
         for (i = 0; i < currWordArr.length; i++) {
           if (word.includes(currWordArr[i])) {
+            console.log("yes")
             elementId = end - 5 + i + 1;
 
             document.getElementById(`${elementId}`).style.backgroundColor =
@@ -52,9 +115,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   function getCurrentWordArray() {
     const numberOfGuessedWords = guessedWords.length;
+
     return guessedWords[numberOfGuessedWords - 1];
+
   }
   function updateGuessedWords(letter) {
+    wordSubmitted = false;
     const currentWordArray = getCurrentWordArray();
     if (currentWordArray && currentWordArray.length < 5) {
       currentWordArray.push(letter);
@@ -97,4 +163,19 @@ document.addEventListener("DOMContentLoaded", function () {
       updateGuessedWords(letter);
     });
   }
+  document.addEventListener("keydown", (e) => {
+    key = getPressedKey(e);
+
+    console.log(key);
+    if (key === undefined) {
+      return;
+    }else if (key === "enter") {
+      handleSubmitWord();
+      return;
+    } else if (key === "backspace") {
+      handleDeleteLetter();
+      return;
+    }
+    updateGuessedWords(key.toLowerCase());
+  });
 });
